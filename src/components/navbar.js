@@ -20,10 +20,12 @@ import { useMutation } from "react-query";
 import { API } from "../config/api";
 import { Alert } from "react-bootstrap";
 import { useQuery } from "react-query";
+import LoginPage from "./auth/Login";
 
 
 function Navbar() {
   const [state] = useContext(UserContext);
+ 
 
   useEffect(() => {
     console.log("this state", state);
@@ -31,11 +33,12 @@ function Navbar() {
 
   return (
     <>
-      <div>
+      <div >
         { state.isLogin === true ? (
           <PrivatePage />
         ) : (
           <GuestPage />
+          
         )}
       </div>
     </>
@@ -72,17 +75,13 @@ function PrivatePage(props) {
       const response = await API.get(`/user/${id}`);
       return response.data.data;
     });
-
-  
-
-
   return (
       
     <div className="App Container bg-danger ">
       {/* {isLoading ? 
       <></>  
      : <> */}
-      <div className="">
+      <div className="mr-5 "  >
         <nav className="container navbar navbar-expand-lg bg-danger navbar-light">
           <div className="justify-content-start" onClick={handleHome} style={{ cursor: "pointer" }}>
             <img src={Icon} alt="" />
@@ -91,44 +90,34 @@ function PrivatePage(props) {
             <span class="navbar-toggler-icon"></span>
           </button>
 
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto"></ul>
+          <div class="collapse navbar-collapse " id="navbarSupportedContent" >
+            <ul class="navbar-nav mr-auto "></ul>
             <form class="form-inline my-2 my-lg-0">
-              <div className="dropdown">
-                <img src={profile?.image ?  profile?.image  : Profil} alt=""
+              <div className="dropdown ">
+                <img src={ Profil} alt=""
                   className="dropdown rounded-circle" width={40} height={40} type="button" id="dropdownMenu2" data-toggle="dropdown"/>
-                <ul className="dropdown-menu " aria-labelledby="dropdownMenu2" style={{position:"absolute",left:10,right:100}}>
-                  <li
-                    className="dropdown-content mr-5 mt-1 "
-                    style={{ cursor: "pointer" }}
-                  >
+                <ul className="dropdown-menu " aria-labelledby="dropdownMenu2" style={{position:"absolute",left:0,right:20000}}>
+                  <li className="dropdown-content  mt-1 " style={{ cursor: "pointer" }}>
                     <div className="bg-white " onClick={handleProfile}>
-                      <img
-                        src={Profile}
-                        className="img fluid mr-3 ml-1"
-                        alt="profile"
-                      ></img>
-                      <span className="title-down">Profile</span>
+                      <img src={Profile} className="img fluid mr-3 ml-1" alt="profile"></img>
+                      <span className="title-down font-weight-bold">Profile</span>
                     </div>
                   </li>
-                  <li
-                    className="dropdown-content mr-5 mt-1 "
-                    style={{ cursor: "pointer" }}
-                  >
+                  <li className="dropdown-content  mt-1 " style={{ cursor: "pointer" }}>
                     <div className="bg-white " onClick={handleRaise}>
                       <img src={Raise} className="img fluid mr-3 ml-1" alt="profile" ></img>
-                      <span className="title-down">Raise Fund</span>
+                      <span className="title-down font-weight-bold">Raise Fund</span>
                     </div>
                   </li>
                   <hr />
-                  <li className="dropdown-content mr-5 mt-1" style={{ cursor: "pointer" }}>
+                  <li className="dropdown-content  mt-1" style={{ cursor: "pointer" , }}>
                     <div onClick={logout} className="bg-white ">
                       <img
                         src={Logout}
                         className="img fluid mr-3 "
                         alt="profile"
                       ></img>
-                      <span className="title-down">Logout</span>
+                      <span className="title-down font-weight-bold">Logout</span>
                     </div>
                   </li>
                 </ul>
@@ -146,58 +135,14 @@ function PrivatePage(props) {
 function GuestPage(props) {
   let navigate = useNavigate();
   const [state, dispatch] = useContext(UserContext);
-  const [message, setMessage] = useState(null);
-
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
-  const { email, password } = form;
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-  const handleSubmit = useMutation(async (e) => {
-    try {
-      e.preventDefault();
-
-      const data = await API.post("/login", form);
-
-      const alert = <Alert variant="success">Login berhasil!</Alert>;
-
-      setMessage(alert);
-      console.log("ini data", data);
-
-      let payload = data.data.data;
-
-      dispatch({
-        type: "LOGIN_SUCCESS",
-        payload,
-      });
-
-      navigate("/");
-
-      console.log("isi payload", payload);
-      console.log("ini data login", data);
-    } catch (e) {
-      console.log(e);
-      const alert = <Alert variant="danger">Email / password salah!</Alert>;
-
-      setMessage(alert);
-    }
-  });
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const handleHome = () => {
     navigate("/");
   };
   return (
-    <div className="App Container bg-danger  ">
-      <div className="container ">
+    <div className="App Container bg-danger  " >
+      <div className="container " id="sticky">
         <nav className="container navbar navbar-expand-lg  navbar-light">
           <div className="justify-content-start " onClick={handleHome} style={{ cursor: "pointer" }}>
             <img src={Icon} alt="HolyWays" />
@@ -208,14 +153,14 @@ function GuestPage(props) {
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto"></ul>
             <form class="form-inline my-2 my-lg-0">
-              <Register />
+            <Button className="bg-white text-danger font-weight-bold mr-3 "  onClick={() => setShowRegister(true)}>Register</Button>
               <div></div>
-              <Button className="bg-white text-danger font-weight-bold  mr-3" onClick={handleShow}>
+              <Button className="bg-white text-danger font-weight-bold  mr-3" onClick={() => setShowLogin(true)}>
                 Login
               </Button>
             </form>
           </div>
-          <Modal show={show} onHide={handleClose}>
+          {/* <Modal show={show} onHide={handleClose}>
             <Modal.Header>
               <Modal.Title>
                 <img src={Login} alt=""></img>
@@ -254,9 +199,12 @@ function GuestPage(props) {
                 </div>
               </Form>
             </Modal.Body>
-          </Modal>
+          </Modal> */}
         </nav>
       </div>
+      <Register show={showRegister} setShow={setShowRegister} setShowLogin={setShowLogin} />
+      <LoginPage show={showLogin} setShow={setShowLogin} setShowRegister={setShowRegister} />
+
     </div>
   );
 }

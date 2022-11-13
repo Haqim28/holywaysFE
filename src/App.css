@@ -38,3 +38,7 @@
     transform: rotate(360deg);
   }
 }
+
+.hidenscroll ::-webkit-scrollbar {
+  display: none;
+}

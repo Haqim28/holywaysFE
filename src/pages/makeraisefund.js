@@ -28,6 +28,7 @@ function MakeRaiseFund() {
           [e.target.name]:
             e.target.type === "file" ? e.target.files : e.target.value,
         });
+        console.log(form);
     
       };
         const handleSubmit = useMutation(async (e) => {

@@ -1,4 +1,5 @@
 import "./App.css";
+import "./index.css";
 import Navbar from "./components/navbar"; // navbar
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
@@ -11,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import DetailDonate from "./pages/detaildonate";
 import MyRaiseFund from "./pages/myraisefund";
 import MakeRaiseFund from "./pages/makeraisefund";
+import ViewDonate from "./pages/viewdonate";
 
 const PrivateRoute = () => {
   const [state] = useContext(UserContext);
@@ -76,7 +78,7 @@ function App() {
           <></>
         ) : (   
           <>
-            <Navbar />
+           <Navbar />
             
            <Routes>
               <Route exact path="/" element={<Home />} />
@@ -84,6 +86,7 @@ function App() {
                   <Route path="/myraisefund" element={<MyRaiseFund />} />
                   <Route path="/makeraisefund" element={<MakeRaiseFund />}/>
                   <Route path="/DetailDonate/:id" element={<DetailDonate />} />
+                  <Route path="/ViewDonate/:id" element={<ViewDonate />} />
                   <Route path="/profile" element={<Profile />} />
               </Route>
             </Routes> 

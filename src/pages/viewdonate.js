@@ -18,95 +18,87 @@ function getSubTotal (data){
 }
 
 
-function DetailDonate() {
-  const [subTotal , setsubTotal] = useState(0)
-  const [fund, setFund] = useState(null);
-  const convertRupiah = require('rupiah-format')
-  const [isLoading, setisLoading] = useState(true);
-  const [persen, setPersen] = useState(null);
-  const [state] = useContext(UserContext);
-  const [transaction, setTransaction] = useState(null);
-  const navigate = useNavigate();
-  const {id} = useParams()
-
-  const [form, setForm] = useState({
+function ViewDonate() {
+     const [subTotal , setsubTotal] = useState(0)
+    const [fund, setFund] = useState(null);
+    const convertRupiah = require('rupiah-format')
+    const [isLoading, setisLoading] = useState(true);
+    const [persen, setPersen] = useState(null);
+    const [state] = useContext(UserContext);
+const [transaction, setTransaction] = useState(null);
+const [transactionPending, setTransactionPending] = useState(null);
+    const navigate = useNavigate();
+    const {id} = useParams()
+    const [form, setForm] = useState({
         fund_id: fund?.id,
         user_id: state.user.id,
         donate_amount: '',
-  });
-  const { donateamount } = form;
-  const getFund = async () => {
+      });
+    const getFund = async () => {
       try {
         const response = await API.get(`/fund/${id}`);
         setFund(response.data.data);
+        let datatransaction = response.data.data.donation
+        console.log("ini data transaction",response.data.data);
+        let datagoal = response.data.data.goal
+        // setsubTotal(getSubTotal(datatransaction))
+        // setPersen ( 100/datagoal*subTotal)
+        console.log(datagoal);
         setisLoading(false);
+        console.log(fund.id);
       } catch (error) {
+        console.log(error);
         setisLoading(false);
       }
-  };
-  
+    };
+  const { donateamount } = form;
   const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
   };
-  const handleDonate = async () => {
+  const handleFinishDonate = async () => {
     try{
-        let data ={
-            fund_id : fund?.id,
-            user_donate_id : state.user.id,
-            user_fund_id : fund.user.id,
-            donate_amount : parseInt(donateamount),
-        }
-        const body = JSON.stringify(data);
-        const config = {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + localStorage.token,
-        },
-        body,
-      };
-      const response = await API.post("/transaction", data,config);
-      const token = response.data.data.token
-      window.snap.pay(token, {
-        onSuccess: function (result) {
-          /* You may add your own implementation here */
-          console.log(result);
-          navigate("/profile");
-        },
-        onPending: function (result) {
-          console.log(result);
-          navigate("/profile");
-        },
-        onError: function (result) {
-          console.log(result);
-        },
-        onClose: function () {
-          alert("you closed the popup without finishing the payment");
-        },
-      });
+     
+      const responseUpdate = await API.delete(`/fund/${fund?.id}`);
+      navigate("/myraisefund")
     }catch (error){
         console.log(error);
     }
-  }
-  const getDonate = async () => {
+}
+const getDonate = async () => {
     try {
     const response = await API.get(`/transactions/${id}`);
       setTransaction(response.data.data);
       if(response.data.data.length !== 0){
         let datatransaction = response.data.data
         let datagoal = response.data.data[0].fund.goal
+        console.log("ini dia",datatransaction.length);
         setsubTotal(getSubTotal(datatransaction))
-        setPersen ( 100/datagoal*subTotal)
+          setPersen ( 100/datagoal*subTotal)
         }
+
+      console.log(transaction);
+      console.log(fund.id);
       setisLoading(false)
     } catch (error) {
+      console.log(error);
       setisLoading(false)
     }
   };
 
-  //For Midtrans
+  const getDonatePending = async () => {
+    try {
+    const response = await API.get(`/transactionsPending/${id}`);
+      setTransactionPending(response.data.data);
+      setisLoading(false)
+    } catch (error) {
+      console.log(error);
+      setisLoading(false)
+    }
+  };
+
   useEffect(() => {
     const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
     const myMidtransClientKey = "SB-Mid-client-pwwGi7P2PdPXwtjX";
@@ -118,12 +110,13 @@ function DetailDonate() {
       document.body.removeChild(scriptTag);
     };
   }, []);
-  //For get fund and donate
   useEffect(() => {
     getFund();
+}, [form,isLoading]);
+useEffect(() => {
     getDonate()
+    getDonatePending()
 }, [persen,isLoading]);
-
     return ( 
         <div className='pt-5 '>
             {
@@ -143,7 +136,7 @@ function DetailDonate() {
                         </div>
                     <p>{fund?.description}</p>
                     <div className='text-center justify-self-end mt-auto '>
-                    <button className='btn btn-danger w-75 text-center font-weight-bold ' data-toggle="modal" data-target="#exampleModalCenter">Donate</button>
+                    <button className='btn btn-danger w-75 text-center font-weight-bold ' data-toggle="modal" data-target="#exampleModalCenter">Akhiri Donasi</button>
                     </div>
 
                 </div>
@@ -151,35 +144,30 @@ function DetailDonate() {
             </div> 
             <div className="col-lg-12  row  justify-content-start ">
                 <div className="col-lg-2 " />
-                <h3 className='font-weight-bold mt-4 col-lg-10'>List Donation ( {transaction?.length} )</h3>
+                <h3 className='font-weight-bold mt-4 col-lg-10'>List Donation Success( {transaction?.length} )</h3>
             </div> 
                 {/* <!-- Modal  */}
                 <div className="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered " role="document">
                     <div className="modal-content">
                     <div className="modal-body ">
-                        <form action="#" className='row ml-2 mr-2'>
-                            <div className="form-group w-100">
-                            <input 
-                            type="number" 
-                            value={donateamount}
-                            name="donateamount"
-                            onChange={handleChange}
-                            className="form-control w-100"  
-                            placeholder="Nominal Donate"></input>
+                        <div className='modal-text'>
+                            <h3 className='text-center text-danger'>Anda Yakin ingin mengakhiri Sesi Donasi Ini ?</h3>
+                            <h5 className='text-center'>Dana yang terkumpul {convertRupiah.convert(subTotal)}</h5>
+                            <h5>Donasi ini masih membutuhkan dana Sebesar</h5>
+                            <span className='font-weight-bold text-center'>{convertRupiah.convert(fund?.goal-subTotal)}</span>
                         </div>
-                        </form>
+                        
                     </div>
                     <div className="modal-footer align-self-end mt-auto">
-                        <button type="button" className="btn btn-danger w-100" onClick={() => handleDonate(donateamount,fund?.id)}>Donate</button>
+                        <button type="button" className="btn btn-danger w-100" onClick={() => handleFinishDonate(donateamount,fund?.id)}>Akhiri Donasi</button>
                     </div>
                     </div>
                 </div>
                 </div>
 
-            <div className="row  justify-content-center hidenscroll" style={{overflowY:"scroll" , height:"50vh"}}>
-              
-              {transaction?.map((item) => (                      
+              <div className="row  justify-content-center hidenscroll" style={{overflowY:"scroll" , height:"50vh"}}>
+             {transaction?.map((item) => (                      
              <Card style={{ width: '18rem' }} className="col-8 ml-3 mt-2 mb-2  p-3 border-radius bg-dark" >
                     <div className="">
                       
@@ -190,19 +178,34 @@ function DetailDonate() {
                       <p className="text-left font-weight-bold text-white" >Total : {convertRupiah.convert(item?.donate_amount)}</p>
                       
                     </div>
-                </Card>
-              
+              </Card>
              ))}
-            
-            
-            
-            </div>                
+            </div>
+            <div className="col-lg-12  row  justify-content-start ">
+                <div className="col-lg-2 " />
+                <h3 className='font-weight-bold mt-4 col-lg-10'>List Donation Not Success( {transaction?.length} )</h3>
+            </div> 
+            <div className="row  justify-content-center hidenscroll" style={{overflowY:"scroll" , height:"50vh"}}>
+             {transactionPending?.map((item) => (                      
+             <Card style={{ width: '18rem' }} className="col-8 ml-3 mt-2 mb-2  p-3 border-radius bg-dark" >
+                    <div className="">
+                      
+                    <h5 className="text-left  pt-2 font-weight-bold text-white">{item?.user_donate?.name} </h5>
+                      <p className="text-left text-danger" >{milisToDate(item?.create_at)}</p>
+                  
+
+                      <p className="text-left font-weight-bold text-white" >Total : {convertRupiah.convert(item?.donate_amount)}</p>
+                      
+                    </div>
+              </Card>
+             ))}
+            </div>                 
                 </>
             }
         </div>
     );
 }
-export default DetailDonate;
+export default ViewDonate;
 
 
 function milisToDate(milis) {

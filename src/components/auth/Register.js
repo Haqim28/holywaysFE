@@ -8,10 +8,7 @@ import { useMutation } from 'react-query';
 import { API } from '../../config/api';
 import {UserContext} from '../../context/userContext'
 
-function Register() {
-  const [show, setShow] = useState(false);
-  
-
+function Register({ show, setShow, setShowLogin }) {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -61,12 +58,8 @@ function Register() {
   });
 
   return (
-    <>
-      
-      <Button className="bg-white text-danger font-weight-bold mr-3 "  onClick={handleShow}>Register</Button>
-      
-      
-      <Modal show={show} onHide={handleClose}>
+    <>  
+      <Modal show={show} onHide={handleClose} centered>
         <Modal.Header >
           <img src={imgRegister} alt="" />
         </Modal.Header>
@@ -110,7 +103,13 @@ function Register() {
         </Modal.Body>
         
             <div className=" text-muted text-center mb-3">
-                      Already have an account ? Klik Here 
+                      Already have an account ? <span
+                      onClick={() => {
+                        setShow(false);
+                        setShowLogin(true);
+                    }}
+                    style={{ cursor: "pointer" }}
+                    >Klik Here</span> 
             </div>
       </Modal>
     </>

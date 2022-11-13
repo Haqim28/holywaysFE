@@ -9,63 +9,70 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userContext";
 import { API } from "../config/api";
 import { useQuery } from "react-query";
+import { L6, L40 } from 'react-isloading'
+
 
 function Profile() {
   const navigate = useNavigate();
+  const convertRupiah = require('rupiah-format')
   const [state] = useContext(UserContext);
-  const [isLoading,setisLoading] = useState(true)
-//   const [profile, setProfile] = useState(null);
+  const [isLoading,setisLoading] = useState(false)
   const id = state.user.id;
   const handleEditProfile = () => {
     navigate("/edit-profile");
   };
 
-  const { data: profile } = useQuery("profileCache", async () => {
+  const { data: profile, refetch  } = useQuery("profileCache", async () => {
     const response = await API.get(`/user/${id}`);
     console.log(response.data.data);
     return response.data.data;
   });
+  const { data: transaction  } = useQuery("transactionCache", async () => {
+    const response = await API.get(`/transaction/${state.user.id}`);
+    console.log(response.data.data);
+    return response.data.data;
+  });
+//   const [transaction, setTransaction] = useState(null)
 
-  // const { data: transaction } = useQuery("transacionCache", async () => {
-  //   const response = await API.get(`/transactions/${state.user.id}`);
-  //   console.log(response.data.data);
-  //   return response.data.data;
-  // });
-  const [transaction, setTransaction] = useState(null)
+//   const getTransaction = async () => {
+//     try {
+//         const response = await API.get(`/transaction/${state.user.id}`);
+//         setTransaction(response.data.data)
+//         console.log(response.data.data);
+//         console.log("ini data transaction");
+//         console.log(transaction);
+//         setisLoading(false)
+//     } catch (error) {
+//         console.log(error);
+//         setisLoading(false)
+//     }
 
-  const getTransaction = async () => {
-    try {
-        const response = await API.get(`/transaction/${state.user.id}`);
-        setTransaction(response.data.data)
-        console.log(response.data.data);
-        console.log("ini data transaction");
-        console.log(transaction);
-        setisLoading(false)
-    } catch (error) {
-        console.log(error);
-        setisLoading(false)
-    }
+// } 
+// useEffect(() => {
+//   if(transaction === null){
+//     getTransaction()
+//   }
+  
+  
+      
+// }, [transaction,isLoading])
 
-} 
-useEffect(() => {
-  if(isLoading){
-      getTransaction()
-  }
-}, [isLoading])
+  
+//   
   return (
 
     <div className="container">
-      {isLoading ? <> </> : <>
-      <div className="d-md-flex justify-content-space-between">
-        <div className="justify-content-start ml-5 mr-5 mt-5 ">
+      {isLoading ? <> <L6 style={{ height: "15rem", width: "15rem", position: "absolute", top: "50%", left: "50%",
+                      transform: "translate(-50%, -50%)"}}/>
+                  </> 
+                  : 
+      <>
+      <div className="row">
+        <div className="justify-content-start ml-5 mr-5 mt-5 col-lg-6">
           <div className="mb-3 title-edit">My Profile</div>
           <div className="d-md-flex">
             <div className="justify-content-start" onClick={handleEditProfile}>
-              <img
-                src={Orang}
-                alt=""
-                width={250}
-              ></img>
+              <img src={Orang} alt="" width={250}></img>
               {/* <button className="btn-block btn-edit-css mt-2 text-white">
                 Edit Profile
               </button> */}
@@ -92,33 +99,38 @@ useEffect(() => {
             </div>
           </div>
         </div>
-
-        <div className=" mt-5 ml-auto">
-          <div className="title-edit">History Donation</div>
-           {transaction?.map((item) => ( 
-          <div className="d-md-flex p-3 bg-white  border">
-            <div className="justify-content-start">
-              <h5 className="history-title">{item?.fund?.title}</h5>
+        <div className=" mt-5 ml-auto hidenscroll col-lg-4" >
+        <span className="title-edit">History Donation</span>
+              <div className="hidenscroll" style={{overflowY:"scroll" , height:"70vh"}}>
+              {transaction?.map((item) => ( 
+          <div className="row p-3 bg-dark  border">
+            <div className="justify-content-start col-lg-8 ">
+              <h5 className="text-white  ">{item?.fund?.title}</h5>
               <h5 className="history-day">
-                <span className="font-weight-bold">
+                <span className="font-weight-bold mt-3">
                   {milisToDate(item?.create_at)}
                   </span>
               </h5>
-              <span className="history-ttl">Total : Rp {item?.donate_amount}</span>
+              <span className="history-ttl ">Total : Rp {convertRupiah.convert(item?.donate_amount)}</span>
             </div>
-            <div className="justify-content-end ml-5">
+            <div className="justify-content-end col-lg-4">
               <img src={Icon} alt=""></img>
-              <div>
-                <img src={Finish} alt=""></img>
+              <div className="pr-5">
+                { item?.status === "success" ? <img src={Finish} alt=""></img> :  
+                
+                <h5 className="text-danger mt-2">{item?.status}</h5>
+
+                }
+                
               </div>
             </div>
           </div>
             ))}  
-
+              </div>
         </div>
     
       </div>
-         </>}
+      </>}
       
     </div>
   );
