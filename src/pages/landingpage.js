@@ -55,16 +55,7 @@ function Home() {
     };
     return ( 
         <div>
-            {isLoading? <><L5
-  style={{
-    height: "15rem",
-    width: "15rem",
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-  }}
-/></> : <>
+            {isLoading? <> </> : <>
        <div className="App Container   bg-danger mb-5 pb-2">
         <div className="container ">
             <div className="container row mb-5 pb-5 " style={{height:550}}>
