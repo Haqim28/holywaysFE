@@ -183,7 +183,7 @@ useEffect(() => {
             </div>
             <div className="col-lg-12  row  justify-content-start ">
                 <div className="col-lg-2 " />
-                <h3 className='font-weight-bold mt-4 col-lg-10'>List Donation Not Success( {transaction?.length} )</h3>
+                <h3 className='font-weight-bold mt-4 col-lg-10'>List Donation Not Success( {transactionPending?.length} )</h3>
             </div> 
             <div className="row  justify-content-center hidenscroll" style={{overflowY:"scroll" , height:"50vh"}}>
              {transactionPending?.map((item) => (                      
