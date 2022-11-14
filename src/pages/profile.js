@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userContext";
 import { API } from "../config/api";
 import { useQuery } from "react-query";
-import { L6, L40 } from 'react-isloading'
+
 
 
 function Profile() {
@@ -32,38 +32,11 @@ function Profile() {
     console.log(response.data.data);
     return response.data.data;
   });
-//   const [transaction, setTransaction] = useState(null)
 
-//   const getTransaction = async () => {
-//     try {
-//         const response = await API.get(`/transaction/${state.user.id}`);
-//         setTransaction(response.data.data)
-//         console.log(response.data.data);
-//         console.log("ini data transaction");
-//         console.log(transaction);
-//         setisLoading(false)
-//     } catch (error) {
-//         console.log(error);
-//         setisLoading(false)
-//     }
-
-// } 
-// useEffect(() => {
-//   if(transaction === null){
-//     getTransaction()
-//   }
-  
-  
-      
-// }, [transaction,isLoading])
-
-  
-//   
   return (
 
     <div className="container">
-      {isLoading ? <> <L6 style={{ height: "15rem", width: "15rem", position: "absolute", top: "50%", left: "50%",
-                      transform: "translate(-50%, -50%)"}}/>
+      {isLoading ? <> 
                   </> 
                   : 
       <>
