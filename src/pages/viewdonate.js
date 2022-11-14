@@ -136,7 +136,7 @@ useEffect(() => {
                         </div>
                     <p>{fund?.description}</p>
                     <div className='text-center justify-self-end mt-auto '>
-                    <button className='btn btn-danger w-75 text-center font-weight-bold ' data-toggle="modal" data-target="#exampleModalCenter">Akhiri Donasi</button>
+                    <button className='btn btn-danger w-75 text-center font-weight-bold ' data-toggle="modal" data-target="#exampleModalCenter">Rincian Donasi</button>
                     </div>
 
                 </div>
@@ -152,7 +152,6 @@ useEffect(() => {
                     <div className="modal-content">
                     <div className="modal-body ">
                         <div className='modal-text'>
-                            <h3 className='text-center text-danger'>Anda Yakin ingin mengakhiri Sesi Donasi Ini ?</h3>
                             <h5 className='text-center'>Dana yang terkumpul {convertRupiah.convert(subTotal)}</h5>
                             <h5>Donasi ini masih membutuhkan dana Sebesar</h5>
                             <span className='font-weight-bold text-center'>{convertRupiah.convert(fund?.goal-subTotal)}</span>
@@ -160,7 +159,7 @@ useEffect(() => {
                         
                     </div>
                     <div className="modal-footer align-self-end mt-auto">
-                        <button type="button" className="btn btn-danger w-100" onClick={() => handleFinishDonate(donateamount,fund?.id)}>Akhiri Donasi</button>
+                        {/* <button type="button" className="btn btn-danger w-100" onClick={() => handleFinishDonate(donateamount,fund?.id)}>Akhiri Donasi</button> */}
                     </div>
                     </div>
                 </div>
