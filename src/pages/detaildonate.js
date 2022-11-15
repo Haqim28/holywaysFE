@@ -2,30 +2,22 @@ import '../App.css';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../context/userContext';
 import { API } from '../config/api';
-import {  useNavigate, useParams } from 'react-router-dom';
+import {Form, Modal} from 'react-bootstrap'
+import {   useNavigate, useParams } from 'react-router-dom';
 import { Card } from 'react-bootstrap';
 
 
-function getSubTotal (data){
-    let Subtotal = 0
-    if(data.length===0){
-      console.log("data nol",data.length);
-      return (Subtotal)
-    }else{
-      for(let i = 0; i < data.length; i++){ Subtotal   += data[i].donate_amount}
-    }
-    return (Subtotal)
-}
+
 
 
 function DetailDonate() {
-  const [subTotal , setsubTotal] = useState(0)
   const [fund, setFund] = useState(null);
+  const [transaction, setTransaction] = useState(null);
+  const [subTotal , setsubTotal] = useState(0)
+  const [persen, setPersen] = useState(null);
   const convertRupiah = require('rupiah-format')
   const [isLoading, setisLoading] = useState(true);
-  const [persen, setPersen] = useState(null);
   const [state] = useContext(UserContext);
-  const [transaction, setTransaction] = useState(null);
   const navigate = useNavigate();
   const {id} = useParams()
 
@@ -51,14 +43,21 @@ function DetailDonate() {
       [e.target.name]: e.target.value,
     });
   };
+
+  const handleProfile = () => {
+    navigate("/profile");
+  };
   const handleDonate = async () => {
     try{
+      
+    
         let data ={
             fund_id : fund?.id,
             user_donate_id : state.user.id,
             user_fund_id : fund.user.id,
             donate_amount : parseInt(donateamount),
         }
+
         const body = JSON.stringify(data);
         const config = {
         method: "POST",
@@ -71,7 +70,6 @@ function DetailDonate() {
       const token = response.data.data.token
       window.snap.pay(token, {
         onSuccess: function (result) {
-          /* You may add your own implementation here */
           console.log(result);
           navigate("/profile");
         },
@@ -123,6 +121,8 @@ function DetailDonate() {
     getFund();
     getDonate()
 }, [persen,isLoading]);
+const [showmodal,setShowmodal] = useState(false)
+const handleClose = () => setShowmodal(false);
 
     return ( 
         <div className='pt-5 '>
@@ -138,12 +138,12 @@ function DetailDonate() {
                   <h2 className='text-center'>{fund?.title}</h2>
                     <h5 className='mt-5 text-center '><span className='text-danger '>{convertRupiah.convert(subTotal)}  </span> gethered from {convertRupiah.convert(fund?.goal)}</h5>
                     <div class="progress mb-3 mt-5">
-                      {console.log("ini persen",subTotal)}
                             <div className="progress-bar bg-danger " role="progressbar" style={{width: `${persen}%`}} aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{Math.round(persen)}%</div>
                         </div>
                     <p>{fund?.description}</p>
                     <div className='text-center justify-self-end mt-auto '>
-                    <button className='btn btn-danger w-75 text-center font-weight-bold ' data-toggle="modal" data-target="#exampleModalCenter">Donate</button>
+                    <button className='btn btn-danger w-75 text-center font-weight-bold '
+                    onClick={() => setShowmodal(true)}>Donate</button>
                     </div>
 
                 </div>
@@ -151,15 +151,22 @@ function DetailDonate() {
             </div> 
             <div className="col-lg-12  row  justify-content-start ">
                 <div className="col-lg-2 " />
-                <h3 className='font-weight-bold mt-4 col-lg-10'>List Donation ( {transaction?.length} )</h3>
+                <h3 className='font-weight-bold mt-4 col-lg-10' onClick={handleProfile}>List Donation ( {transaction?.length} )</h3>
             </div> 
                 {/* <!-- Modal  */}
-                <div className="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered " role="document">
-                    <div className="modal-content">
+                <Modal show={showmodal} onHide={handleClose} centered>
+                {/* <div className="modal-dialog modal-dialog-centered " > */}
+                    {/* <div className="modal-content"> */}
+                    <Modal.Header>
+                        <Modal.Title>
+                          <img src="" alt=""></img>
+                          Donate Ammount
+                        </Modal.Title>
+                    </Modal.Header>
                     <div className="modal-body ">
-                        <form action="#" className='row ml-2 mr-2'>
-                            <div className="form-group w-100">
+                        <Form action="#" className='row ml-2 mr-2'>
+                            <div className="form-group w-100"
+                          >
                             <input 
                             type="number" 
                             value={donateamount}
@@ -167,22 +174,25 @@ function DetailDonate() {
                             onChange={handleChange}
                             className="form-control w-100"  
                             placeholder="Nominal Donate"></input>
+                            <div className="modal-footer align-self-end mt-auto">
+                        
+                    </div>
                         </div>
-                        </form>
+                        </Form>
                     </div>
-                    <div className="modal-footer align-self-end mt-auto">
-                        <button type="button" className="btn btn-danger w-100" onClick={() => handleDonate(donateamount,fund?.id)}>Donate</button>
-                    </div>
-                    </div>
-                </div>
-                </div>
+                    <div className="btn btn-danger w-100" 
+                        onClick={() => handleDonate(donateamount,fund?.id)}>
+                            Donate
+                          </div>
+                    {/* //</div> */}
+                {/* </div> */}
+                </Modal>
 
-            <div className="row  justify-content-center hidenscroll" style={{overflowY:"scroll" , height:"50vh"}}>
+            <div className="row h-100  justify-content-center hidenscroll overflow-auto" >
               
               {transaction?.map((item) => (                      
              <Card style={{ width: '18rem' }} className="col-8 ml-3 mt-2 mb-2  p-3 border-radius bg-dark" >
                     <div className="">
-                      
                     <h5 className="text-left  pt-2 font-weight-bold text-white">{item?.user_donate?.name} </h5>
                       <p className="text-left text-danger" >{milisToDate(item?.create_at)}</p>
                   
@@ -191,6 +201,7 @@ function DetailDonate() {
                       
                     </div>
                 </Card>
+                
               
              ))}
             
@@ -204,6 +215,17 @@ function DetailDonate() {
 }
 export default DetailDonate;
 
+
+function getSubTotal (data){
+  let Subtotal = 0
+  if(data.length===0){
+    console.log("data nol",data.length);
+    return (Subtotal)
+  }else{
+    for(let i = 0; i < data.length; i++){ Subtotal   += data[i].donate_amount}
+  }
+  return (Subtotal)
+}
 
 function milisToDate(milis) {
     let date = new Date(milis);

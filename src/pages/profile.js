@@ -25,6 +25,7 @@ function Profile() {
   const { data: profile, refetch  } = useQuery("profileCache", async () => {
     const response = await API.get(`/user/${id}`);
     console.log(response.data.data);
+    console.log("ini state",state);
     return response.data.data;
   });
   const { data: transaction  } = useQuery("transactionCache", async () => {
