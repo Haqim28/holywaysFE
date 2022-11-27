@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API = axios.create({
-  baseURL: "https://holywaysapp.herokuapp.com/api/v1/",
+  baseURL: "https://holyways.up.railway.app/api/v1/",
 });
 
 export const setAuthToken = (token) => {
